@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Bonus Calculator</title>
+    <style>
+        /* Basic Styles - No Tailwind */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f3f4f6; /* Light gray */
+            color: #1f2937; /* Dark gray */
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 1rem auto;
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #111827; /* Darker gray */
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+             font-size: 1.75rem;
+        }
+         h2 {
+             font-size: 1.25rem;
+             margin-top: 2rem;
+             border-bottom: 1px solid #e5e7eb;
+             padding-bottom: 0.5rem;
+         }
+
+        .form-section, .summary-section, .results-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            background-color: #f9fafb; /* Very light gray */
+        }
+         .summary-section h3, .form-section h3, .results-section h2 {
+             margin-top: 0;
+             margin-bottom: 1rem;
+             text-align: left;
+             font-size: 1.1rem;
+             color: #f97316; /* Orange */
+             border-bottom: none;
+         }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid */
+            gap: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #4b5563;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-sizing: border-box; /* Include padding in width */
+            font-size: 1rem;
+        }
+         .input-group input:focus, .input-group select:focus {
+             border-color: #f97316;
+             outline: 1px solid #f97316;
+         }
+
+        .summary-item, .results-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .summary-item span:first-child, .results-item span:first-child {
+            font-weight: 500;
+            color: #374151;
+        }
+         .summary-item span:last-child, .results-item span:last-child {
+            font-weight: 600;
+        }
+        .results-item.total {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #d1d5db;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .results-item.total span:last-child {
+             color: #ea580c; /* Orange */
+        }
+        .results-value-subtle {
+             font-size: 0.8rem;
+             margin-left: 0.25rem;
+             color: #6b7280;
+             font-weight: 400;
+        }
+        .tier-badge {
+            margin-left: 0.5rem;
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.5rem;
+            vertical-align: middle;
+            background-color: #dcfce7; /* Default green */
+            color: #15803d;
+        }
+         .bonus-icon {
+            margin-left: 0.25rem;
+        }
+
+
+        .button-container {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.15s ease-in-out;
+        }
+        .clear-button {
+             background-color: #e5e7eb; /* Gray */
+             color: #374151;
+        }
+        .clear-button:hover {
+             background-color: #d1d5db;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Bonus Calculator</h1>
+
+        <div class="summary-section">
+            <h3>Monthly Goals Summary</h3>
+            <div class="summary-item">
+                <span>Revenue Goal:</span>
+                <span id="summary-revenue-goal">$0.00</span>
+            </div>
+            <div class="summary-item">
+                <span>Target New Members:</span>
+                <span id="summary-target-members">0</span>
+            </div>
+            <div class="summary-item">
+                <span>SA Hours Limit:</span>
+                <span id="summary-sa-hours">≤ 150 hrs</span>
+            </div>
+        </div>
+
+        <div class="form-section">
+             <div style="display: flex; justify-content: space-between; align-items: center;">
+                 <h3>Input Data</h3>
+                 <button id="clear-button" class="clear-button">Clear Form</button>
+             </div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="month">Month:</label>
+                    <input type="month" id="month" name="month">
+                </div>
+                <div class="input-group">
+                    <label for="studio">Studio:</label>
+                    <select id="studio" name="studio">
+                        <option value="">Select Studio</option>
+                        <option value="Clearwater">Clearwater</option>
+                        <option value="Trinity">Trinity</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="revenueGoal">Revenue Goal ($):</label>
+                    <input type="number" min="0" id="revenueGoal" name="revenueGoal" value="66000">
+                </div>
+                <div class="input-group">
+                    <label for="actualRevenue">Actual Revenue ($):</label>
+                    <input type="number" min="0" id="actualRevenue" name="actualRevenue" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="actualNRR">Actual NRR ($):</label>
+                    <input type="number" min="0" id="actualNRR" name="actualNRR" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="saHours">SA Hours:</label>
+                    <input type="number" min="0" id="saHours" name="saHours" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="targetNewMembers">Target New Members:</label>
+                    <input type="number" min="0" id="targetNewMembers" name="targetNewMembers" value="25">
+                </div>
+                <div class="input-group">
+                    <label for="actualNewMembers">Actual New Members:</label>
+                    <input type="number" min="0" id="actualNewMembers" name="actualNewMembers" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>Results for <span id="results-month">Month</span></h2>
+            <div class="results-item">
+                <span>Revenue Performance:</span>
+                <span id="results-revenue-perf"></span>
+            </div>
+            <div class="results-item">
+                <span>Membership Growth:</span>
+                <span id="results-membership-growth"></span>
+            </div>
+             <div class="results-item">
+                <span>NRR Bonus:</span>
+                <span id="results-nrr-bonus"></span>
+            </div>
+             <div class="results-item">
+                <span>Payroll Control Bonus:</span>
+                <span id="results-payroll-bonus"></span>
+            </div>
+             <div class="results-item total">
+                <span>Total Estimated Bonus:</span>
+                <span id="results-total-bonus">$0.00</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Constants ---
+        const SA_HOURS_LIMIT = 150;
+        const PAYROLL_BONUS_AMOUNT = 100;
+        const TIER_1_PERCENT = 95;
+        const TIER_1_NRR_BONUS = 3; // 3%
+        const TIER_2_PERCENT = 100;
+        const TIER_2_NRR_BONUS = 5; // 5%
+        const TIER_3_PERCENT = 105;
+        const TIER_3_NRR_BONUS = 8; // 8%
+
+        // --- Get Element References ---
+        const inputs = {
+            month: document.getElementById('month'),
+            studio: document.getElementById('studio'),
+            revenueGoal: document.getElementById('revenueGoal'),
+            actualRevenue: document.getElementById('actualRevenue'),
+            actualNRR: document.getElementById('actualNRR'),
+            saHours: document.getElementById('saHours'),
+            targetNewMembers: document.getElementById('targetNewMembers'),
+            actualNewMembers: document.getElementById('actualNewMembers'),
+        };
+
+        const summary = {
+             revenueGoal: document.getElementById('summary-revenue-goal'),
+             targetMembers: document.getElementById('summary-target-members'),
+             saHours: document.getElementById('summary-sa-hours'), // Static text, but could update if needed
+        };
+
+        const resultsDisplay = {
+            month: document.getElementById('results-month'),
+            revenuePerf: document.getElementById('results-revenue-perf'),
+            membershipGrowth: document.getElementById('results-membership-growth'),
+            nrrBonus: document.getElementById('results-nrr-bonus'),
+            payrollBonus: document.getElementById('results-payroll-bonus'),
+            totalBonus: document.getElementById('results-total-bonus'),
+        };
+
+        const clearButton = document.getElementById('clear-button');
+
+        // --- Helper Functions ---
+        const formatCurrency = (amount) => {
+            if (amount == null || isNaN(amount)) return '$0.00';
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+        };
+
+        const formatPercent = (value) => {
+            if (value == null || isNaN(value)) return '0.0%';
+            return `${value.toFixed(1)}%`;
+        };
+
+         const formatMonthName = (monthString) => {
+            if (!monthString || typeof monthString !== 'string') return 'Month';
+            try {
+                const date = new Date(monthString + '-01T12:00:00Z');
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-US', { month: 'long' });
+                }
+            } catch (e) { console.error("Error parsing month:", e); }
+            return 'Month'; // Default
+         };
+
+        // --- Calculation Logic ---
+        function calculateAndDisplay() {
+            // Read and parse inputs
+            const revenue = parseFloat(inputs.actualRevenue.value) || 0;
+            const nrr = parseFloat(inputs.actualNRR.value) || 0;
+            const hours = parseFloat(inputs.saHours.value) || 0;
+            const goal = parseFloat(inputs.revenueGoal.value) || 0;
+            const actualMembers = parseFloat(inputs.actualNewMembers.value) || 0;
+            const targetMembers = parseFloat(inputs.targetNewMembers.value) || 0;
+            const monthValue = inputs.month.value;
+
+            // Calculate Revenue Percentage
+            const revenuePercent = goal > 0 ? (revenue / goal) * 100 : 0;
+
+            // Determine NRR Bonus Percentage and Tier
+            let nrrBonusPercent = 0;
+            let tierHit = 0;
+            if (revenuePercent >= TIER_3_PERCENT) {
+                nrrBonusPercent = TIER_3_NRR_BONUS;
+                tierHit = 3;
+            } else if (revenuePercent >= TIER_2_PERCENT) {
+                nrrBonusPercent = TIER_2_NRR_BONUS;
+                tierHit = 2;
+            } else if (revenuePercent >= TIER_1_PERCENT) {
+                nrrBonusPercent = TIER_1_NRR_BONUS;
+                tierHit = 1;
+            }
+
+            // Calculate NRR Bonus Amount
+            const nrrBonusAmount = (nrrBonusPercent / 100) * nrr;
+
+            // Determine Payroll Bonus Amount
+            const payrollBonusAmount = hours > 0 && hours <= SA_HOURS_LIMIT ? PAYROLL_BONUS_AMOUNT : 0;
+
+            // Calculate Total Bonus
+            const totalBonus = nrrBonusAmount + payrollBonusAmount;
+
+            // Calculate Membership Percentage
+            const membershipPercent = targetMembers > 0 ? (actualMembers / targetMembers) * 100 : 0;
+
+            // --- Update Summary Display ---
+            summary.revenueGoal.textContent = formatCurrency(goal);
+            summary.targetMembers.textContent = targetMembers;
+            summary.saHours.textContent = `≤ ${SA_HOURS_LIMIT} hrs`; // Update static text if needed
+
+
+            // --- Update Results Display ---
+            resultsDisplay.month.textContent = formatMonthName(monthValue);
+
+            // Revenue Performance HTML
+            let revenuePerfHTML = `
+                ${formatCurrency(revenue)} / ${formatCurrency(goal)}
+                <span style="margin-left: 0.5rem; font-weight: 600; color: ${revenuePercent >= TIER_1_PERCENT ? '#16a34a' : '#dc2626'};">
+                    (${formatPercent(revenuePercent)})
+                </span>`;
+            resultsDisplay.revenuePerf.innerHTML = revenuePerfHTML;
+
+            // Membership Growth HTML
+            let membershipHTML = `
+                ${actualMembers} / ${targetMembers} new members
+                <span style="margin-left: 0.5rem; font-weight: 600; color: ${membershipPercent >= 100 ? '#ea580c' : '#6b7280'};">
+                    (${formatPercent(membershipPercent)})
+                </span>`;
+            resultsDisplay.membershipGrowth.innerHTML = membershipHTML;
+
+            // NRR Bonus HTML
+            let nrrBonusHTML = `${formatCurrency(nrrBonusAmount)}`;
+            if (nrrBonusAmount > 0) {
+                 nrrBonusHTML += `<span class="bonus-icon" role="img" aria-label="Bonus earned">✅</span>`;
+            }
+            // Add Tier Badge (simplified - just text for now)
+            if (tierHit > 0) {
+                 resultsDisplay.nrrBonus.previousElementSibling.innerHTML = `NRR Bonus (${nrrBonusPercent}%): <span class="tier-badge badge-tier-${tierHit}">Tier ${tierHit} Hit!</span>`;
+            } else {
+                 resultsDisplay.nrrBonus.previousElementSibling.textContent = `NRR Bonus (${nrrBonusPercent}%):`;
+            }
+            resultsDisplay.nrrBonus.innerHTML = nrrBonusHTML;
+
+
+            // Payroll Bonus HTML
+            let payrollBonusHTML = `${payrollBonusAmount > 0 ? '+ ' + formatCurrency(payrollBonusAmount) : formatCurrency(0)}`;
+             if (payrollBonusAmount > 0) {
+                 payrollBonusHTML += `<span class="bonus-icon" role="img" aria-label="Bonus earned">✅</span>`;
+            }
+            payrollBonusHTML += `<span class="results-value-subtle">(${hours} hrs)</span>`;
+            resultsDisplay.payrollBonus.innerHTML = payrollBonusHTML;
+            resultsDisplay.payrollBonus.style.color = payrollBonusAmount > 0 ? '#ea580c' : '#6b7280';
+
+
+            // Total Bonus HTML
+            resultsDisplay.totalBonus.textContent = formatCurrency(totalBonus);
+        }
+
+        // --- Event Listeners ---
+        // Recalculate when any input changes
+        Object.values(inputs).forEach(inputElement => {
+            inputElement.addEventListener('input', calculateAndDisplay);
+        });
+
+        // Clear button functionality
+        clearButton.addEventListener('click', () => {
+            inputs.month.value = '';
+            inputs.studio.value = '';
+            inputs.revenueGoal.value = '66000'; // Default
+            inputs.actualRevenue.value = '';
+            inputs.actualNRR.value = '';
+            inputs.saHours.value = '';
+            inputs.targetNewMembers.value = '25'; // Default
+            inputs.actualNewMembers.value = '';
+
+            // Recalculate and display after clearing
+            calculateAndDisplay();
+        });
+
+        // --- Initial Calculation on Load ---
+        calculateAndDisplay();
+
+    </script>
+
+</body>
+</html>
