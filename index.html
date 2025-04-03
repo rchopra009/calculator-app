@@ -24,6 +24,12 @@
             border: 1px solid #e5e7eb;
         }
 
+        /* NEW: Logo container style */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1rem; /* Space below logo */
+        }
+
         h1, h2 {
             text-align: center;
             color: #111827; /* Darker gray */
@@ -31,6 +37,7 @@
         }
         h1 {
              font-size: 1.75rem;
+             margin-top: 0; /* Adjust if needed after logo */
         }
          h2 {
              font-size: 1.25rem;
@@ -149,11 +156,37 @@
              background-color: #d1d5db;
         }
 
+        /* REMOVED: Animation CSS */
+        /* @keyframes lift { ... } */
+        /* .animate-lift { ... } */
+
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div class="logo-container">
+             <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                {/* Using OkBunny SVG markup, removed animation class */}
+                <path d="M 50 95 C 40 95, 35 85, 35 75 Q 35 60, 50 60 Q 65 60, 65 75 C 65 85, 60 95, 50 95 Z" fill="#E5E7EB" stroke="#4B5563" strokeWidth="2"/>
+                <circle cx="50" cy="45" r="15" fill="#F3F4F6" stroke="#4B5563" strokeWidth="2"/>
+                <ellipse cx="40" cy="25" rx="5" ry="12" transform="rotate(-15 40 25)" fill="#F3F4F6" stroke="#4B5563" strokeWidth="2"/>
+                <ellipse cx="60" cy="25" rx="5" ry="12" transform="rotate(15 60 25)" fill="#F3F4F6" stroke="#4B5563" strokeWidth="2"/>
+                <circle cx="45" cy="45" r="1.5" fill="#374151"/>
+                <circle cx="55" cy="45" r="1.5" fill="#374151"/>
+                <path d="M 43 52 Q 50 57, 57 52" fill="none" stroke="#374151" strokeWidth="1.5"/>
+                <path d="M 38 68 Q 25 72, 20 62" fill="none" stroke="#4B5563" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M 62 68 Q 75 72, 80 62" fill="none" stroke="#4B5563" strokeWidth="3" strokeLinecap="round"/>
+                {/* Barbell (Static) - Removed animate-lift class */}
+                <g>
+                    <rect x="15" y="60" width="70" height="4" rx="2" fill="#4B5563"/>
+                    <rect x="5" y="55" width="10" height="14" rx="2" fill="#F97316"/>
+                    <rect x="85" y="55" width="10" height="14" rx="2" fill="#F97316"/>
+                    <rect x="8" y="57" width="4" height="10" rx="1" fill="#EA580C"/>
+                    <rect x="88" y="57" width="4" height="10" rx="1" fill="#EA580C"/>
+                </g>
+            </svg>
+        </div>
         <h1>Bonus Calculator</h1>
 
         <div class="summary-section">
@@ -269,7 +302,7 @@
         const summary = {
              revenueGoal: document.getElementById('summary-revenue-goal'),
              targetMembers: document.getElementById('summary-target-members'),
-             saHours: document.getElementById('summary-sa-hours'), // Static text, but could update if needed
+             saHours: document.getElementById('summary-sa-hours'),
         };
 
         const resultsDisplay = {
@@ -348,7 +381,7 @@
             // --- Update Summary Display ---
             summary.revenueGoal.textContent = formatCurrency(goal);
             summary.targetMembers.textContent = targetMembers;
-            summary.saHours.textContent = `≤ ${SA_HOURS_LIMIT} hrs`; // Update static text if needed
+            summary.saHours.textContent = `≤ ${SA_HOURS_LIMIT} hrs`;
 
 
             // --- Update Results Display ---
@@ -375,13 +408,13 @@
             if (nrrBonusAmount > 0) {
                  nrrBonusHTML += `<span class="bonus-icon" role="img" aria-label="Bonus earned">✅</span>`;
             }
-            // Add Tier Badge (simplified - just text for now)
+            let nrrLabelHTML = `NRR Bonus (${nrrBonusPercent}%):`;
             if (tierHit > 0) {
-                 resultsDisplay.nrrBonus.previousElementSibling.innerHTML = `NRR Bonus (${nrrBonusPercent}%): <span class="tier-badge badge-tier-${tierHit}">Tier ${tierHit} Hit!</span>`;
-            } else {
-                 resultsDisplay.nrrBonus.previousElementSibling.textContent = `NRR Bonus (${nrrBonusPercent}%):`;
+                 // Basic badge styling via CSS class
+                 nrrLabelHTML += ` <span class="tier-badge badge-tier-${tierHit}">Tier ${tierHit} Hit!</span>`;
             }
-            resultsDisplay.nrrBonus.innerHTML = nrrBonusHTML;
+            resultsDisplay.nrrBonus.previousElementSibling.innerHTML = nrrLabelHTML; // Update label separately
+            resultsDisplay.nrrBonus.innerHTML = nrrBonusHTML; // Update amount
 
 
             // Payroll Bonus HTML
